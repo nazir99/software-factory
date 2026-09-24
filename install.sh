@@ -3,7 +3,7 @@
 # Usage: ./install.sh [skills-dir]   (default: ~/.claude/skills)
 set -euo pipefail
 DEST="${1:-$HOME/.claude/skills}"
-SKILLS=(nsq reader-walkthrough drawing-t-accounts)
+SKILLS=(nsq netsuite-data-solutioning reader-walkthrough drawing-t-accounts)
 
 mkdir -p "$DEST"
 for s in "${SKILLS[@]}"; do

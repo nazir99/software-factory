@@ -17,8 +17,11 @@ data      logic on the data             code       review gate
 | netsuite-data-solutioning | Design logic on the data, rebuild it independently, tie it out, second-model review | `SOLUTION: TIED \| NOT TIED \| UNREVIEWED` | In progress |
 | [reader-walkthrough](https://github.com/nazir99/reader-walkthrough) | Walk the finished screen or report as its real reader and report where they stall | `VERDICT: PASS \| STALLS n` | Live |
 
-Supporting skill: [drawing-t-accounts](https://github.com/nazir99/drawing-t-accounts)
-renders GL movement as T accounts in any medium.
+Supporting skills (used by any link, installed with the rest):
+
+| Skill | Job | Status |
+|---|---|---|
+| [drawing-t-accounts](https://github.com/nazir99/drawing-t-accounts) | Show how cost or money moved through GL accounts as T accounts, in any medium | Live |
 
 ## Rules every link follows
 

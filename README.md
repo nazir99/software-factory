@@ -15,7 +15,7 @@ data      logic on the data             code       review gate
 |---|---|---|---|
 | [nsq](https://github.com/nazir99/nsq) | Get NetSuite data out read-only, prove it is complete and correctly shaped, store it safely | `NSQ: VERIFIED \| NOT VERIFIED \| BLOCKED` | Live |
 | netsuite-data-solutioning | Design logic on the data, rebuild it independently, tie it out, second-model review | `SOLUTION: TIED \| NOT TIED \| UNREVIEWED` | In progress |
-| reader-walkthrough | Walk the finished screen or report as its real reader and report where they stall | `VERDICT: PASS \| STALLS n` | Coming |
+| [reader-walkthrough](https://github.com/nazir99/reader-walkthrough) | Walk the finished screen or report as its real reader and report where they stall | `VERDICT: PASS \| STALLS n` | Live |
 
 Supporting skill: [drawing-t-accounts](https://github.com/nazir99/drawing-t-accounts)
 renders GL movement as T accounts in any medium.

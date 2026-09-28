@@ -23,6 +23,8 @@ Supporting skills (used by any link, installed with the rest):
 |---|---|---|
 | [drawing-t-accounts](https://github.com/nazir99/drawing-t-accounts) | Show how cost or money moved through GL accounts as T accounts, in any medium | Live |
 
+nsq also ships a NetSuite schema graph: `nsq schema path|table|search|chain` returns join keys and traps for standard tables, with each account's custom fields cached locally.
+
 ## Rules every link follows
 
 - One job per skill, with a machine-readable last line.

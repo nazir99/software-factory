@@ -1,46 +1,85 @@
 # software-factory
 
-A chain of agent skills that produce work and check it before a person sees it.
-Each skill is one link: it does one job, and it ends with a status line the
-next link (or a pipeline) can read.
+**AI can build finance tools quickly. The hard part is trusting what it built.**
 
-## The chain
+This is a set of instructions for AI coding assistants (Claude Code, Codex and
+similar). They make the assistant prove its own NetSuite work before a person
+reviews it. The assistant pulls the data, proves the numbers against NetSuite's
+own figures and checks that the result is easy to read. Every step ends in a
+plain pass or fail.
 
-```
-nsq  ->  netsuite-data-solutioning  ->  build  ->  reader-walkthrough
-data      logic on the data             code       review gate
-```
+Status as of 2026-10-01: steps 1, 2 and 4 are published and in use on a live
+NetSuite costing project. Step 3 is ordinary development, so it has no repository.
 
-| Link | Job | Ends with | Status |
+## How it works: four steps
+
+| Step | What happens | It ends with | Repository |
 |---|---|---|---|
-| [nsq](https://github.com/nazir99/nsq) | Get NetSuite data out read-only, prove it is complete and correctly shaped, store it safely | `NSQ: VERIFIED \| NOT VERIFIED \| BLOCKED` | Live |
-| [netsuite-data-solutioning](https://github.com/nazir99/netsuite-data-solutioning) | Design logic on the data, rebuild it independently, tie it out, second-model review | `SOLUTION: TIED \| NOT TIED \| UNREVIEWED` | Live |
-| [reader-walkthrough](https://github.com/nazir99/reader-walkthrough) | Walk the finished screen or report as its real reader and report where they stall | `VERDICT: PASS \| STALLS n` | Live |
+| 1. Get the data | Pulls the data out of NetSuite without changing anything. Checks that nothing is missing and that it foots to a NetSuite figure. | **Verified**, **not verified** (with the reason) or **blocked** | [nsq](https://github.com/nazir99/nsq) |
+| 2. Prove the logic | Writes the business rule in plain words. Rebuilds the calculation separately and ties it out to NetSuite's own figures. A second AI then tries to break it. | **Tied**, **not tied** (how many rows did not match) or **unreviewed** | [netsuite-data-solutioning](https://github.com/nazir99/netsuite-data-solutioning) |
+| 3. Build | Ordinary development: the screen, report or feed. Not a separate repository. | Deployed | none |
+| 4. Reader review | Reads the finished screen or report the way its real reader will. Reports every point where that reader would get stuck. | **Pass**, or **stalls** with the worst one named | [reader-walkthrough](https://github.com/nazir99/reader-walkthrough) |
 
-Supporting skills (used by any link, installed with the rest):
+A step starts only when the step before it passed.
 
-| Skill | Job | Status |
-|---|---|---|
-| [drawing-t-accounts](https://github.com/nazir99/drawing-t-accounts) | Show how cost or money moved through GL accounts as T accounts, in any medium | Live |
+One helper skill installs with the set:
+[drawing-t-accounts](https://github.com/nazir99/drawing-t-accounts) shows how cost
+or money moved through GL accounts as T accounts.
 
-nsq also ships a NetSuite schema graph: `nsq schema path|table|search|chain` returns join keys and traps for standard tables, with each account's custom fields cached locally.
+## What it caught on its first real run
 
-## Rules every link follows
+The first run was a cost-pool screen for a manufacturer, showing the average cost
+ledger per item and location. Client names and amounts are left out.
 
-- One job per skill, with a machine-readable last line.
-- Runs unattended; asks a person only before anything irreversible or production.
-- A link starts only when the previous link passed.
-- No client data in any repository.
+- **Five calculation defects found** in a screen that was already in use,
+  including landed cost at the wrong amount and revaluations valued incorrectly.
+- **A test that looked complete was not.** It skipped every zero-stock and
+  standard-cost pool.
+- **A rule that "matched" was rejected.** It was fitted on one pool, made 19
+  of 227 other pools worse, and was not shipped.
+- **Result (production, 2026-09-28):** 15,727 of 15,729 pools end exactly on
+  NetSuite's own inventory value for that item and location.
+  The 2 that do not are a gap inside NetSuite itself (location value vs GL after
+  backdated entries), not in the calculation.
+
+## The rules every step follows
+
+- **It never changes NetSuite data.** Every step only reads from NetSuite.
+- **Sandbox first.** A step uses production data only when a person asked for it
+  in that task.
+- **Nothing is called right until it is proven against an independent figure.** A
+  check that only compares the work with itself does not count.
+- **It says what it did not check.** "Not verified" and "unreviewed" are real
+  answers, not failures to hide.
+- **No client data in any repository.**
+
+## Who reads what
+
+| You are | Read |
+|---|---|
+| Deciding whether to trust the output | This page, then the "Why" section of each step's README |
+| Installing it | [Install](#install) below |
+| An AI assistant | Each repository's `SKILL.md`. Those files are written for the AI, not for people. |
 
 ## Install
 
 ```bash
 git clone https://github.com/nazir99/software-factory.git
-./software-factory/install.sh            # into ~/.claude/skills by default
+./software-factory/install.sh            # installs every step into ~/.claude/skills
 ```
 
-Run it again to update. Each skill is also a plain folder in the open Agent Skills
-format and can be cloned on its own.
+Run it again to update. Step 1 also ships a command-line tool. Its README covers
+the one-time NetSuite setup.
+
+## For pipelines: the exact result lines
+
+Each step's last line is fixed, so a script can read it:
+
+```
+NSQ: VERIFIED <rows> rows from <alias> [<env>] | NOT VERIFIED <reason> | BLOCKED <reason>
+SOLUTION: TIED | NOT TIED <n unmatched | no tie-out> | UNREVIEWED <reason>
+VERDICT: PASS | STALLS <count> | worst: <Where>
+```
 
 ## License
 
